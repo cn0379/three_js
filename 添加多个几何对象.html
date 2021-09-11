@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>多个几何对象</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <!--引入three.js三维引擎-->
+    <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/build/three.js"></script>
+    <!-- <script src="./three.js"></script> -->
+    <!-- <script src="http://www.yanhuangxueyuan.com/threejs/build/three.js"></script> -->
+</head>
+
+<body>
+    <script>
+        /**
+         * 创建场景对象Scene
+         */
+        var scene = new THREE.Scene();
+        /**
+         * 创建网格模型
+         */
+        var geometry = new THREE.BoxGeometry(200, 200, 100); //创建一个立方体几何对象Geometry
+        var material = new THREE.MeshLambertMaterial({
+            color: 0xffff00 // 代表材质的颜色
+        }); //材质对象Material
+        var mesh = new THREE.Mesh(geometry, material); //网格模型对象Mesh 接受两个参数一个物体一个材质
+        scene.add(mesh); //网格模型添加到场景中
+        var geometry2 = new THREE.SphereGeometry(60, 40, 40); //创建一个球体几何对象
+        var material2 = new THREE.MeshPhongMaterial({
+            color: 0x0000ff,
+            specular: 0x4488ee,
+            shininess: 12
+        });// 球体表面的高光效果。
+        var mesh2 = new THREE.Mesh(geometry2, material2); //网格模型对象Mesh 接受两个参数一个物体一个材质
+        mesh2.translateY(150);
+        scene.add(mesh2); //网格模型添加到场景中
+        /**
+         * 光源设置
+         */
+        //点光源
+        var point = new THREE.PointLight(0xffffff); //点光源的颜色
+        point.position.set(200, 300, 400); //点光源位置  数值代表光亮强度  刚好对应正方体的长宽高
+        scene.add(point); //点光源添加到场景中
+        //环境光
+        var ambient = new THREE.AmbientLight(0xff0000); // 环境光红色加黄色等于橙色
+        scene.add(ambient);
+        // console.log(scene.children)
+
+        // 辅助坐标系  参数250表示坐标系大小，可以根据场景大小去设置
+        var axisHelper = new THREE.AxisHelper(250);
+        scene.add(axisHelper);
+        /**
+         * 相机设置
+         */
+        var width = window.innerWidth; //窗口宽度
+        var height = window.innerHeight; //窗口高度
+        var k = width / height; //窗口宽高比
+        var s = 200; //三维场景显示范围控制系数，系数越大，显示的范围越大
+        //创建正交相机对象
+        /*   
+          * 投影到的物体大小不受距离的影响
+          * left	渲染空间的左边界
+          * right	渲染空间的右边界
+          * top	渲染空间的上边界
+          * bottom	渲染空间的下边界
+          * near	near属性表示的是从距离相机多远的位置开始渲染，一般情况会设置一个很小的值。 默认值0.1
+          * far	far属性表示的是距离相机多远的位置截止渲染，如果设置的值偏小小，会有部分场景看不到。 默认值1000
+          * left的值不能够大于right的值，而且left和right设置的值必须位于摄像机position中x坐标的两侧，否则将看不到影像。
+          * left与right之间的距离和top与bottom之间的距离的比例一定要和原始的canvas画布比例相等，不然会导致投影的物体形状变形。
+          * https://www.cnblogs.com/gaozhiqiang/p/11579161.html
+          * left值大于摄像机x坐标值，right小于摄像机x坐标值，top大于摄像机y坐标值
+          * bottom小于摄像机y坐标值都将会导致摄像机映射不出物体图像。
+        */
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);// fov aspect 
+        camera.position.set(100, 100, 100); //设置相机位置x y（负上正下） z 
+        camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+        /**
+         * 创建渲染器对象
+         */
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);//设置渲染区域尺寸
+        renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+        document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
+        
+        //执行渲染操作   指定场景、相机作为参数
+        // renderer.render(scene, camera);
+        function render() {
+            renderer.render(scene, camera);//执行渲染操作
+            mesh.rotateY(0.01);//每次绕y轴旋转0.01弧度
+            requestAnimationFrame(render);//请求再次执行渲染函数render
+        }
+        render();
+    </script>
+</body>
+
+</html>
