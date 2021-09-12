@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/build/three.js"></script>
+    <script>
+        var scene = new THREE.Scene();
+        // 点
+        // var geometry = new THREE.SphereGeometry(100, 25, 25); //创建一个球体几何对象
+        // // 创建一个点材质对象
+        // var material = new THREE.PointsMaterial({
+        //     color: 0x0000ff, //颜色
+        //     size: 2, //点渲染尺寸
+        // });
+        // //点模型对象  参数：几何体  点材质
+        // var point = new THREE.Points(geometry, material);
+        // scene.add(point); //网格模型添加到场景中
+
+        // 线
+        // var geometry = new THREE.SphereGeometry(100, 25, 25);//球体
+        // 直线基础材质对象  
+        // var material = new THREE.LineBasicMaterial({
+        //     color: 0x0000ff,
+        // });
+        // 虚线材质对象：产生虚线效果
+        // var material = new THREE.LineDashedMaterial({
+        //     color: 0x0000ff,
+        //     dashSize: 10,//显示线段的大小。默认为3。
+        //     gapSize: 1,//间隙的大小。默认为1
+        // });
+        // var line = new THREE.Line(geometry, material); //线模型对象
+        // //  computeLineDistances方法  计算LineDashedMaterial所需的距离数组
+        // line.computeLineDistances();
+
+        // var line = new THREE.Line(geometry, material); //线模型对象
+        // scene.add(line); //点模型添加到场景中
+        // 网格模型
+        var geometry = new THREE.BoxGeometry(200, 200, 100); //创建一个立方体几何对象Geometry
+        // 基础网格材质对象MeshBasicMaterial,不受带有方向光源影响，没有棱角感。
+        // var material = new THREE.MeshBasicMaterial({
+        //     color: 0x0000ff // 代表材质的颜色
+        // });
+        // MeshLambertMaterial材质可以实现网格Mesh表面与光源的漫反射光照计算，
+        // 有了光照计算，物体表面分界的位置才会产生棱角感。
+        // 这种材质可以用来创建暗淡的并不光亮的表面。
+        // var material = new THREE.MeshLambertMaterial({ color: 0x00ffff });
+        // 高光网格材质MeshPhongMaterial除了和MeshLambertMaterial一样
+        // 可以实现光源和网格表面的漫反射光照计算，
+        // 还可以产生高光效果(镜面反射)。
+        var material = new THREE.MeshPhongMaterial({
+            color: 0xffff00,
+            specular: 0x444444,//高光部分的颜色
+            shininess: 20,//高光部分的亮度，默认30
+        });
+
+        var mesh = new THREE.Mesh(geometry, material); //网格模型对象Mesh 接受两个参数一个物体一个材质
+        scene.add(mesh); //网格模型添加到场景中
+
+
+        // 辅助坐标系  参数250表示坐标系大小，可以根据场景大小去设置
+        // X轴红色，Y轴绿色，Z轴蓝色。
+        var axisHelper = new THREE.AxisHelper(150);
+        scene.add(axisHelper);
+        /**
+         * 光源设置
+         */
+        //点光源
+        var point = new THREE.PointLight(0xffffff); //点光源的颜色
+        point.position.set(200, 300, 400); //点光源位置  数值代表光亮强度  刚好对应正方体的长宽高
+        scene.add(point); //点光源添加到场景中
+        //环境光
+        var ambient = new THREE.AmbientLight(0xff0000); // 环境光红色加黄色等于橙色
+        scene.add(ambient);
+        // 相机
+        var width = window.innerWidth; //窗口宽度
+        var height = window.innerHeight; //窗口高度
+        var k = width / height; //窗口宽高比
+        var s = 200; //三维场景显示范围控制系数，系数越大，显示的范围越大
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);// fov aspect 
+        camera.position.set(100, 100, 100); //设置相机位置x y（负上正下） z 
+        camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+        /**
+         * 创建渲染器对象
+         */
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);//设置渲染区域尺寸
+        renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+        document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
+
+        //执行渲染操作   指定场景、相机作为参数
+        renderer.render(scene, camera);
+
+    </script>
+</body>
+
+</html>

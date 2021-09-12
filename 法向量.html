@@ -32,20 +32,19 @@
 
         var normals = new Float32Array([
             0, 0, 1, //顶点1法向量
-            0, 0, 1, //顶点2法向量
+            1, 0, 1, //顶点2法向量
             0, 0, 1, //顶点3法向量
 
-            0, 1, 0, //顶点4法向量
-            0, 1, 0, //顶点5法向量
-            0, 1, 0, //顶点6法向量
+            1, 1, 0, //顶点4法向量
+            1, 1, 0, //顶点5法向量
+            1, 1, 0, //顶点6法向量
         ]);
         // 设置几何体attributes属性的位置normal属性
         geometry.attributes.normal = new THREE.BufferAttribute(normals, 3); //3个为一组,表示一个顶点的法向量数据
         //材质对象
-        var material = new THREE.MeshBasicMaterial({
+        var material = new THREE.MeshNormalMaterial({
             // 使用顶点颜色数据渲染模型，不需要再定义color属性
             side: THREE.DoubleSide,//两面可见
-            color : THREE.VertexColors, // 以顶点颜色为准
             // 把材质属性.vertexColors的值设置为THREE.VertexColors,threejs
             // 渲染模型的时候就会使用几何体的顶点颜色数据geometry.attributes.color。
             size: 10.0 //点对象像素尺寸
