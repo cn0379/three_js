@@ -12,34 +12,36 @@
     <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/build/three.js"></script>
     <script>
         var scene = new THREE.Scene();
-        var geometry = new THREE.Geometry(); //声明一个几何体对象Geometry
-        // 三维样条曲线  Catmull-Rom算法
-        // var curve = new THREE.CatmullRomCurve3([
-        //     new THREE.Vector3(-50, 20, 90),
-        //     new THREE.Vector3(-10, 40, 40),
-        //     new THREE.Vector3(0, 0, 0),
-        //     new THREE.Vector3(60, -60, 0),
-        //     new THREE.Vector3(70, 0, 80)
-        // ]);
-        // //getPoints是基类Curve的方法，返回一个vector3对象作为元素组成的数组
-        // var points = curve.getPoints(100); //分段数100，返回101个顶点
-        // ————————————————————————————————————————————————————
-        var p1 = new THREE.Vector3(-0, 10, 0);
-        var p2 = new THREE.Vector3(100, 100, 50);
-        var p3 = new THREE.Vector3(50, 0, 0);
-        // 三维二次贝赛尔曲线
-        var curve = new THREE.QuadraticBezierCurve3(p1, p2, p3);
-        var points = curve.getPoints(100); //分段数100，返回101个顶点
 
-        // setFromPoints方法从points中提取数据改变几何体的顶点属性vertices
-        geometry.setFromPoints(points);
+        var geometry = new THREE.BoxGeometry(100, 100, 100); //创建一个立方体几何对象Geometry
+        console.log(geometry);
+        console.log('几何体顶点位置数据', geometry.vertices);
+        console.log('三角行面数据', geometry.faces);
+        var p1 = new THREE.Vector3(50, 0, 0); //顶点1坐标
+        var p2 = new THREE.Vector3(0, 70, 0); //顶点2坐标
+        var p3 = new THREE.Vector3(80, 70, 0); //顶点3坐标
+        //顶点坐标添加到geometry对象
+        geometry.vertices.push(p1, p2, p3);
+
+        // Color对象表示顶点颜色数据
+        var color1 = new THREE.Color(0x00ff00); //顶点1颜色——绿色
+        var color2 = new THREE.Color(0xff0000); //顶点2颜色——红色
+        var color3 = new THREE.Color(0x0000ff); //顶点3颜色——蓝色
+        //顶点颜色数据添加到geometry对象
+        geometry.colors.push(color1, color2, color3);
+
         //材质对象
-        var material = new THREE.LineBasicMaterial({
-            color: 0x000000
+        var material = new THREE.PointsMaterial({
+            // 使用顶点颜色数据渲染模型，不需要再定义color属性
+            // color: 0xff0000,
+            vertexColors: THREE.VertexColors, // 以顶点颜色为准
+            // 把材质属性.vertexColors的值设置为THREE.VertexColors,threejs
+            // 渲染模型的时候就会使用几何体的顶点颜色数据geometry.attributes.color。
+            size: 10.0 //点对象像素尺寸
         });
-        //线条模型对象
-        var line = new THREE.Line(geometry, material);
-        scene.add(line); //线条对象添加到场景中
+        // 点渲染模式  点模型对象Points
+        var points = new THREE.Points(geometry, material); //点模型对象
+        scene.add(points); //点对象添加到场景
 
         // 辅助坐标系  参数250表示坐标系大小，可以根据场景大小去设置
         // X轴红色，Y轴绿色，Z轴蓝色。

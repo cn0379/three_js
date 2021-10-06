@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>光源对象</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            /* 隐藏body窗口区域滚动条 */
+        }
+    </style>
+    <!--引入three.js三维引擎-->
+    <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/build/three.js"></script>
+    <!-- <script src="./three.js"></script> -->
+    <!-- <script src="http://www.yanhuangxueyuan.com/threejs/build/three.js"></script> -->
+</head>
+
+<body>
+    <script>
+        /**
+         * 创建场景对象Scene
+         */
+        var scene = new THREE.Scene();
+        /**
+         * 创建网格模型
+         */
+        var geometry = new THREE.BoxGeometry(40, 100, 40);
+        var material = new THREE.MeshLambertMaterial({
+            color: 0x0000ff
+        });
+        var mesh = new THREE.Mesh(geometry, material);
+        // mesh.position.set(0,0,0)
+        scene.add(mesh);
+
+        // 设置产生投影的网格模型
+        mesh.castShadow = true;
+
+
+        //创建一个平面几何体作为投影面
+        var planeGeometry = new THREE.PlaneGeometry(300, 200);
+        var planeMaterial = new THREE.MeshLambertMaterial({
+            color: 0x999999
+        });
+        // 平面网格模型作为投影面
+        var planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+        scene.add(planeMesh); //网格模型添加到场景中
+        planeMesh.rotateX(-Math.PI / 2); //旋转网格模型
+        planeMesh.position.y = -50; //设置网格模型y坐标
+        // 设置接收阴影的投影面
+        planeMesh.receiveShadow = true;
+
+        // 方向光
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        // 设置光源位置
+        directionalLight.position.set(60, 100, 40);
+        scene.add(directionalLight);
+        // 设置用于计算阴影的光源对象
+        directionalLight.castShadow = true;
+        // 设置计算阴影的区域，最好刚好紧密包围在对象周围
+        // 计算阴影的区域过大：模糊  过小：看不到或显示不完整
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 300;
+        directionalLight.shadow.camera.left = -50;
+        directionalLight.shadow.camera.right = 50;
+        directionalLight.shadow.camera.top = 200;
+        directionalLight.shadow.camera.bottom = -100;
+        // 设置mapSize属性可以使阴影更清晰，不那么模糊
+        // directionalLight.shadow.mapSize.set(1024,1024)
+        console.log(directionalLight.shadow.camera);
+
+        // 聚光光源
+        var spotLight = new THREE.SpotLight(0xffffff);
+        // 设置聚光光源位置
+        spotLight.position.set(50, 120, 50);
+        // 设置聚光光源发散角度
+        spotLight.angle = Math.PI / 6
+        scene.add(spotLight); //光对象添加到scene场景中
+        // 设置用于计算阴影的光源对象
+        spotLight.castShadow = true;
+        // 设置计算阴影的区域，注意包裹对象的周围
+        spotLight.shadow.camera.near = 1;
+        spotLight.shadow.camera.far = 300;
+        spotLight.shadow.camera.fov = 20;
+
+        // 设置产生投影的网格模型
+        mesh.castShadow = true;
+
+        // 设置网格模型planeMesh接收其它模型的阴影(planeMesh作为投影面使用)
+        planeMesh.receiveShadow = true;
+
+        // 设置用于计算阴影的光源对象
+        directionalLight.castShadow = true;
+
+        // spotLight.castShadow = true;
+        // 聚光源设置
+        spotLight.shadow.camera.near = 1;
+        spotLight.shadow.camera.far = 300;
+        spotLight.shadow.camera.fov = 20;
+
+        directionalLight.shadow.mapSize.set(1024, 1024)
+
+        // console.log(scene.children)
+        /**
+         * 相机设置
+         */
+        var width = window.innerWidth; //窗口宽度
+        var height = window.innerHeight; //窗口高度
+        var k = width / height; //窗口宽高比
+        var s = 200; //三维场景显示范围控制系数，系数越大，显示的范围越大
+        //创建正交相机对象
+        /*   
+          * 投影到的物体大小不受距离的影响
+          * left	渲染空间的左边界
+          * right	渲染空间的右边界
+          * top	渲染空间的上边界
+          * bottom	渲染空间的下边界
+          * near	near属性表示的是从距离相机多远的位置开始渲染，一般情况会设置一个很小的值。 默认值0.1
+          * far	far属性表示的是距离相机多远的位置截止渲染，如果设置的值偏小小，会有部分场景看不到。 默认值1000
+          * left的值不能够大于right的值，而且left和right设置的值必须位于摄像机position中x坐标的两侧，否则将看不到影像。
+          * left与right之间的距离和top与bottom之间的距离的比例一定要和原始的canvas画布比例相等，不然会导致投影的物体形状变形。
+          * https://www.cnblogs.com/gaozhiqiang/p/11579161.html
+          * left值大于摄像机x坐标值，right小于摄像机x坐标值，top大于摄像机y坐标值
+          * bottom小于摄像机y坐标值都将会导致摄像机映射不出物体图像。
+        */
+        console.log(-s * k);
+        var camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);// fov aspect 
+        camera.position.set(100, 100, 100); //设置相机位置x y（负上正下） z 
+        camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
+        /**
+         * 创建渲染器对象
+         */
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(width, height);//设置渲染区域尺寸
+        renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+        document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
+        //执行渲染操作   指定场景、相机作为参数
+        renderer.render(scene, camera);
+       
+    </script>
+</body>
+
+</html>
